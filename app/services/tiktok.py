@@ -254,9 +254,7 @@ class TikTokService:
 
         return self._pick_video_format(info, quality)
 
-    def _pick_video_format(
-        self, info: dict[str, Any], quality: Quality
-    ) -> dict[str, Any] | None:
+    def _pick_video_format(self, info: dict[str, Any], quality: Quality) -> dict[str, Any] | None:
         formats = info.get("formats") or []
         video_formats = [f for f in formats if f.get("vcodec") not in (None, "none")]
         clean = [f for f in video_formats if not self._is_watermarked(f)]

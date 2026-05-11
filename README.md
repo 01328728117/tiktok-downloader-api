@@ -256,7 +256,29 @@ mypy app
 
 ## Deployment
 
-### Sevalla / Render / Railway / Heroku (Procfile)
+### Sevalla (Nixpacks, recommended)
+
+A complete walkthrough lives at [`docs/deploy-sevalla.md`](docs/deploy-sevalla.md).
+The repo ships everything Sevalla needs out of the box:
+
+- `nixpacks.toml` — pins Python 3.11, installs `ffmpeg`, sets the gunicorn
+  start command for the web service.
+- `runtime.txt` / `.python-version` — Python version hints for Nixpacks /
+  buildpacks.
+- `Dockerfile` — alternative if you switch the build strategy to Docker.
+
+Quick checklist:
+
+1. Connect the repo in Sevalla → Applications → Add application.
+2. Build strategy stays **Nixpacks** (default). Pick the smallest tier.
+3. Provision a **Redis** database in the same region.
+4. Add an **internal connection** Redis → app and rename the injected var to
+   `REDIS_URL`.
+5. Add a **background worker** process with start command
+   `/opt/venv/bin/celery -A app.workers.celery_app.celery_app worker --loglevel=info`.
+6. Set `API_KEYS`, `RATE_LIMIT`, `CACHE_TTL_SECONDS`, `CELERY_TASK_ALWAYS_EAGER=false`.
+
+### Render / Railway / Heroku (Procfile)
 
 The included `Procfile` declares two process types:
 

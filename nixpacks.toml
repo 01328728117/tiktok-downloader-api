@@ -1,0 +1,19 @@
+# Nixpacks build configuration — used by Sevalla, Railway, and other
+# Nixpacks-based hosts. Sets the Python runtime, installs ffmpeg for yt-dlp
+# audio extraction, installs project dependencies, and defines the start
+# command for the web service. The background worker (celery) must be added
+# as a separate Sevalla "Background worker" process — see docs/deploy-sevalla.md.
+
+[phases.setup]
+nixPkgs = ["python311", "ffmpeg"]
+aptPkgs = ["ca-certificates", "curl"]
+
+[phases.install]
+cmds = [
+  "python -m venv /opt/venv",
+  ". /opt/venv/bin/activate && pip install --upgrade pip",
+  ". /opt/venv/bin/activate && pip install .",
+]
+
+[start]
+cmd = "/opt/venv/bin/gunicorn app.main:app --workers ${WEB_CONCURRENCY:-2} --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:${PORT:-8000} --timeout 120 --access-logfile - --error-logfile -"
