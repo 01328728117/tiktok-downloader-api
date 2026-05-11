@@ -1,0 +1,154 @@
+{
+  "info": {
+    "_postman_id": "9d4d9b8e-1f3b-4d3a-9a9a-tiktokdl0001",
+    "name": "TikTok Downloader API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman collection for the TikTok Video Downloader REST API."
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "api_key",
+      "value": "changeme-dev-key",
+      "type": "string"
+    },
+    {
+      "key": "task_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sample_url",
+      "value": "https://www.tiktok.com/@scout2015/video/6718335390845095173",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {"key": "key", "value": "X-API-Key", "type": "string"},
+      {"key": "value", "value": "{{api_key}}", "type": "string"},
+      {"key": "in", "value": "header", "type": "string"}
+    ]
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": ["{{base_url}}"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Root index",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/",
+          "host": ["{{base_url}}"],
+          "path": [""]
+        }
+      }
+    },
+    {
+      "name": "POST /api/v1/download",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json && json.task_id) {",
+              "  pm.collectionVariables.set('task_id', json.task_id);",
+              "}",
+              "pm.test('queued or completed', () => {",
+              "  pm.expect(['queued','processing','completed']).to.include(json.status);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"{{sample_url}}\",\n  \"quality\": \"high\",\n  \"format\": \"mp4\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/download",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "download"]
+        }
+      }
+    },
+    {
+      "name": "GET /api/v1/status/:task_id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v1/status/{{task_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "status", "{{task_id}}"]
+        }
+      }
+    },
+    {
+      "name": "GET /api/v1/result/:task_id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v1/result/{{task_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "result", "{{task_id}}"]
+        }
+      }
+    },
+    {
+      "name": "GET /api/v1/info",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v1/info?url={{sample_url}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "info"],
+          "query": [{"key": "url", "value": "{{sample_url}}"}]
+        }
+      }
+    },
+    {
+      "name": "POST /api/v1/download (MP3)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"{{sample_url}}\",\n  \"quality\": \"medium\",\n  \"format\": \"mp3\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/download",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "download"]
+        }
+      }
+    }
+  ]
+}
