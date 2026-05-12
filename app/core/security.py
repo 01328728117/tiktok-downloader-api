@@ -22,10 +22,14 @@ async def require_api_key(
     if not allowed:
         return None
 
-    provided = request.headers.get(settings.api_key_header)
+    provided = (
+        request.headers.get(settings.api_key_header)
+        or request.query_params.get(settings.api_key_header)
+    )
     if not provided or provided not in allowed:
         raise UnauthorizedError(
             "Missing or invalid API key",
             details={"header": settings.api_key_header},
         )
     return provided
+    
